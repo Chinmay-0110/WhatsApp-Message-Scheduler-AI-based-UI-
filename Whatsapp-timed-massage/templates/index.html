@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WhatsApp Message Scheduler</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .instructions {
+      background-color: #f8f8f8;
+      padding: 15px;
+      margin-top: 20px;
+      border-left: 4px solid #25D366;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .instructions h3 {
+      margin-top: 0;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📲 WhatsApp Message Scheduler</h1>
+
+    <label for="country">Select Country:</label>
+    <select id="country">
+      <option value="+91">🇮🇳 India (+91)</option>
+      <option value="+1">🇺🇸 USA (+1)</option>
+      <option value="+44">🇬🇧 UK (+44)</option>
+      <option value="+61">🇦🇺 Australia (+61)</option>
+      <option value="+81">🇯🇵 Japan (+81)</option>
+      <option value="+49">🇩🇪 Germany (+49)</option>
+      <option value="+971">🇦🇪 UAE (+971)</option>
+      <option value="+880">🇧🇩 Bangladesh (+880)</option>
+      <option value="+92">🇵🇰 Pakistan (+92)</option>
+    </select>
+
+    <input type="text" id="number" placeholder="Phone number (without country code)">
+    <textarea id="message" placeholder="Your message here..."></textarea>
+    <input type="time" id="time">
+
+    <button onclick="schedule()">Schedule Message</button>
+    <p id="status"></p>
+
+    <div class="instructions">
+      <h3>📝 How It Works</h3>
+      <ul>
+        <li>Select your country and enter the phone number (without country code).</li>
+        <li>Write the message you want to send and choose the time.</li>
+        <li>The system will open <strong>WhatsApp Web</strong> at the scheduled time and send the message.</li>
+      </ul>
+      <h3>⚠️ Important Notes</h3>
+      <ul>
+        <li>⏰ The time must be <strong>1-2 minutes ahead</strong> of the current time.</li>
+        <li>💬 You must be <strong>logged in to WhatsApp Web</strong> in your default browser.</li>
+        <li>🌐 Do not close your browser or shut down Python until the message is sent.</li>
+        <li>📞 Make sure the number is on WhatsApp, or the message will fail.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function schedule() {
+      const countryCode = document.getElementById('country').value;
+      const number = document.getElementById('number').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const time = document.getElementById('time').value;
+
+      if (!number || !message || !time) {
+        document.getElementById('status').innerText = "❌ Please fill in all fields.";
+        return;
+      }
+
+      const fullNumber = countryCode + number;
+
+      fetch('/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: fullNumber, message, time })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('status').innerText = data.msg;
+      });
+    }
+  </script>
+</body>
+</html>
+ 
